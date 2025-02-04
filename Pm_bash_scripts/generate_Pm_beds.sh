@@ -24,7 +24,7 @@ mv *cov5.bed Pm_cov5_beds/
 
 cd Pm_cov5_beds
 
-bedtools multiinter -i *.bed | awk '$4>=42' > Pm_60percentcov5_unmerged.bed
+bedtools multiinter -i *.bed | awk '$4>=43' > Pm_60percentcov5_unmerged.bed
 
 bedtools merge -i Pm_60percentcov5_unmerged.bed -d 10 > Pm_60percentcov5_merged.bed
 
