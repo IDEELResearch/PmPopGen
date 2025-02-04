@@ -51,7 +51,7 @@ final_samples <- vcfR::read.vcfR("../Pm_HC_missingness_filtered_first.vcf.gz") |
 
 variant_count <- final_samples$fix |> subset(!stringr::str_detect(CHROM, "archived")) |> subset(!stringr::str_detect(CHROM, "MIT")) |> subset(!stringr::str_detect(CHROM, "API")) |> subset(FILTER == "PASS")
 
-final_samples <- final_samples$gt$Indiv |> unique() |> as.data.frame()
+    final_samples <- final_samples$gt$Indiv |> unique() |> as.data.frame()
 
 names(final_samples) <- "Sample"
 
@@ -62,6 +62,8 @@ final_sample_coverage_summary <- dplyr::semi_join(sample_coverage_summary, final
                                                                                                                                                                       Chroms_20X == 14 ~ "20",
                                                                                                                                                                       Chroms_10X == 14 ~ "10",
                                                                                                                                                                       .default = "<10"))
+
+final_sample_coverage_summary2 <- coverage_by_chromosome |> dplyr::group_by(Sample) |> dplyr::summarize(Mean_Coverage = mean(coverage), Median_Coverage = median(coverage))
 
 below_10X_coverage <- final_sample_coverage_summary |> subset(Chroms_10X < 14)
 
@@ -144,7 +146,7 @@ all_refstats <- do.call(rbind, refstats_tables)
 all_refstats <- all_refstats |> dplyr::rename(Species = `#name`)
 
 percentages <- all_refstats |> tidyr::pivot_wider(names_from = Species, values_from = assignedReads, id_cols = c("Sample")) |> as.data.frame() |>
-  mutate(All_Reads = Hs + Pf + Pm) |> mutate(Percent_Pm = (Pm / All_Reads) * 100)
+  dplyr::mutate(All_Reads = Hs + Pf + Pm) |> dplyr::mutate(Percent_Pm = (Pm / All_Reads) * 100)
 
 percentages <- percentages |> dplyr::mutate(Country = dplyr::case_when(stringr::str_detect(Sample, "Gam_[:digit:]+") ~ "Nigeria",
                                                                        stringr::str_detect(Sample, "^[:digit:]+") ~ "DRC",
@@ -165,7 +167,7 @@ summary(Pm_reads_only$Count)
 
 summary(Pm_reads_only$Percent_Pm)
 
-enrichment_plot |> ggplot(aes(fill = read_type, y = Count, x = factor(Sample, levels = unique(Sample[order(Pm_Reads, decreasing = TRUE)]), ordered = TRUE), angle = 90)) +
+Cam_enrichment <- enrichment_plot |> dplyr::filter(Country == "Cameroon") |> ggplot(aes(fill = read_type, y = Count, x = factor(Sample, levels = unique(Sample[order(Pm_Reads, decreasing = TRUE)]), ordered = TRUE), angle = 90)) +
   geom_bar(position = "fill", stat = "identity") +
   #geom_text(aes(x = Sample, y = 0.95, label = scales::comma(All_Reads))) +
   #geom_text(aes(x = Sample, y = -0.05, label = scales::comma(Pm_Reads))) +
@@ -182,12 +184,76 @@ enrichment_plot |> ggplot(aes(fill = read_type, y = Count, x = factor(Sample, le
   scale_fill_brewer(palette = "YlOrBr", direction = 1) +
   ylab("Percent of Reads") +
   xlab("Sample (Sorted by Number of Pm Reads)") +
-  ggtitle(expression(paste("Proportion of ", italic("P. malariae "), "Reads"))) #+
+  ggtitle("Cameroon")
+  #ggtitle(expression(paste("Proportion of ", italic("P. malariae "), "Reads"))) #+
   #annotate("text", x = 50, y = -0.05, label = "Pm Reads", angle = 90) +
   #annotate("text", x = 50, y = 0.95, label = "All Reads", angle = 90) +
   #coord_cartesian(xlim = c(0,49), clip = "off")
 
-ggsave("enrichment_plot.png", dpi = 600, width = 12, height = 10, units = "in")
+DRC_enrichment <- enrichment_plot |> dplyr::filter(Country == "DRC") |> ggplot(aes(fill = read_type, y = Count, x = factor(Sample, levels = unique(Sample[order(Pm_Reads, decreasing = TRUE)]), ordered = TRUE), angle = 90)) +
+  geom_bar(position = "fill", stat = "identity") +
+  #geom_text(aes(x = Sample, y = 0.95, label = scales::comma(All_Reads))) +
+  #geom_text(aes(x = Sample, y = -0.05, label = scales::comma(Pm_Reads))) +
+  theme_light() +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.title = element_blank(),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        axis.title.x = element_text(size = 30),
+        plot.title = element_text(size = 30),
+        legend.text = element_text(size = 30)) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_brewer(palette = "YlOrBr", direction = 1) +
+  ylab("Percent of Reads") +
+  xlab("Sample (Sorted by Number of Pm Reads)") +
+  ggtitle("DRC")
+
+Nigeria_enrichment <- enrichment_plot |> dplyr::filter(Country == "Nigeria") |> ggplot(aes(fill = read_type, y = Count, x = factor(Sample, levels = unique(Sample[order(Pm_Reads, decreasing = TRUE)]), ordered = TRUE), angle = 90)) +
+  geom_bar(position = "fill", stat = "identity") +
+  #geom_text(aes(x = Sample, y = 0.95, label = scales::comma(All_Reads))) +
+  #geom_text(aes(x = Sample, y = -0.05, label = scales::comma(Pm_Reads))) +
+  theme_light() +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.title = element_blank(),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        axis.title.x = element_text(size = 30),
+        plot.title = element_text(size = 30),
+        legend.text = element_text(size = 30)) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_brewer(palette = "YlOrBr", direction = 1) +
+  ylab("Percent of Reads") +
+  xlab("Sample (Sorted by Number of Pm Reads)") +
+  ggtitle("Nigeria")
+
+Tanzania_enrichment <- enrichment_plot |> dplyr::filter(Country == "Tanzania") |> ggplot(aes(fill = read_type, y = Count, x = factor(Sample, levels = unique(Sample[order(Pm_Reads, decreasing = TRUE)]), ordered = TRUE), angle = 90)) +
+  geom_bar(position = "fill", stat = "identity") +
+  #geom_text(aes(x = Sample, y = 0.95, label = scales::comma(All_Reads))) +
+  #geom_text(aes(x = Sample, y = -0.05, label = scales::comma(Pm_Reads))) +
+  theme_light() +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.title = element_blank(),
+        axis.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        axis.title.x = element_text(size = 30),
+        plot.title = element_text(size = 30),
+        legend.text = element_text(size = 30)) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_brewer(palette = "YlOrBr", direction = 1) +
+  ylab("Percent of Reads") +
+  xlab("Sample (Sorted by Number of Pm Reads)") +
+  ggtitle("Tanzania")
+
+library(patchwork)
+
+FigS1 <- Cam_enrichment + DRC_enrichment + Nigeria_enrichment + Tanzania_enrichment + plot_layout(guides = "collect", axes = "collect", axis_titles = "collect")
+
+#setwd("C:/Users/zpopkinh/OneDrive - University of North Carolina at Chapel Hill/Pm and Po Sequencing/Twist Pm/rerun/")
+
+ggsave("../FigS1.png", dpi = 600, width = 12, height = 10, units = "in")
 
 enrichment_plot <- enrichment_plot |> dplyr::mutate(Capture = dplyr::case_when(stringr::str_detect(Sample, "HC[:digit:]+") ~ stringr::str_extract(Sample, "HC[:digit:]+"),
                                                                                stringr::str_detect(Sample, "Test_Pm_HC") ~ "Test_HC"))
