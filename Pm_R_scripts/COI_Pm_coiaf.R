@@ -5,7 +5,7 @@ library(coiaf)
 
 setwd("C:/Users/zpopkinh/OneDrive - University of North Carolina at Chapel Hill/Pm and Po Sequencing/Twist Pm/rerun")
 
-#bcftools view -e 'MAF[0]<0.05' -r PmUG01_01_v1,PmUG01_02_v1,PmUG01_03_v1,PmUG01_04_v1,PmUG01_05_v1,PmUG01_06_v1,PmUG01_07_v1,PmUG01_08_v1,PmUG01_09_v1,PmUG01_10_v1,PmUG01_11_v1,PmUG01_12_v1,PmUG01_13_v1,PmUG01_14_v1 -Oz -o Pm_all_exclude_MAF5.vcf.gz Pm_HC_missingness_filtered_first.vcf.gz
+system("bcftools view -e 'MAF[0]<0.05' -r PmUG01_01_v1,PmUG01_02_v1,PmUG01_03_v1,PmUG01_04_v1,PmUG01_05_v1,PmUG01_06_v1,PmUG01_07_v1,PmUG01_08_v1,PmUG01_09_v1,PmUG01_10_v1,PmUG01_11_v1,PmUG01_12_v1,PmUG01_13_v1,PmUG01_14_v1 -Oz -o Pm_all_exclude_MAF5.vcf.gz Pm_HC_missingness_filtered_first.vcf.gz")
 
 
 Pm_HC <- vcfR::read.vcfR("Pm_all_exclude_MAF5.vcf.gz")
