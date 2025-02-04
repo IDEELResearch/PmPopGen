@@ -91,6 +91,85 @@ Tajima_genes_metadata |> writexl::write_xlsx("Pm_genes_Tajima.xlsx")
 
 #exons_only |> data.table::fwrite("exons_overlapping_sig_Tajima.txt", col.names =F, sep = "\n")
 
+#redoing Tajima's D in 2kb windows with a 100bp step size to satisfy Reviewer 2
+
+Pm_genes_Tajima <- data.table::fread("Pm_genes_2kbwindow_100bpstep_Tajima.txt") 
+
+#Pm_genes_Tajima|> dplyr::arrange(desc(abs(TajimaD))) |> writexl::write_xlsx("Pm_genes_Tajima.xlsx")
+
+nonneutral_Pm_genes <- Pm_genes_Tajima |> subset(abs(TajimaD) > 2)
+
+top_Pm_genes <- Pm_genes_Tajima |> dplyr::arrange(desc(abs(TajimaD))) |> dplyr::slice_head(prop = 0.005)
+
+Pm_exons_Tajima <- data.table::fread("Pm_exons_2kbwindow_100bpstep_Tajima.txt")
+
+#Pm_exons_Tajima|> dplyr::arrange(desc(abs(TajimaD))) |> writexl::write_xlsx("Pm_exons_Tajima.xlsx")
+
+nonneutral_Pm_exons <- Pm_exons_Tajima |> subset(abs(TajimaD) > 2)
+
+top_Pm_exons <- Pm_exons_Tajima |> dplyr::arrange(desc(abs(TajimaD))) |> dplyr::slice_head(prop = 0.005)
+
+masked_orthologs <- readxl::read_xlsx("Pf-Pm_masked_orthologs.xlsx")
+
+#Pm_masked_orthos <- masked_orthologs |> dplyr::select(Group_ID, Pm_CHROM, Pm_START, Pm_END, Pm_LENGTH, Pm_ortho) |> dplyr::rename(CHROM = Pm_CHROM, START = Pm_START, END = Pm_END) |> GenomicRanges::makeGRangesFromDataFrame(na.rm = TRUE, keep.extra.columns = TRUE)
+
+PmGFF_genes <- ape::read.gff("../PlasmoDB-67_PmalariaeUG01.gff") |> subset(!stringr::str_detect(seqid, "_archived_|MIT|API")) |> subset(stringr::str_detect(type, "_gene")) |> tidyr::separate_wider_delim(attributes, delim = ";", names = c("ID", "Name", "description", "biotype"), too_few = "align_start", too_many = "debug") |> 
+  dplyr::mutate(ID = stringr::str_remove(ID, "ID="), biotype = dplyr::case_when(stringr::str_detect(biotype, "ebi_biotype=") ~ stringr::str_remove(biotype, "ebi_biotype="),
+                                                                                stringr::str_detect(description, "ebi_biotype=") ~ stringr::str_remove(description, "ebi_biotype=")), description = dplyr::case_when(stringr::str_detect(description, "description=") ~ stringr::str_remove(description, "description="),
+                                                                                                                                                                                                                     stringr::str_detect(Name, "description=") ~ stringr::str_remove(Name, "description=")), Name = dplyr::case_when(stringr::str_detect(Name, "Name=") ~ stringr::str_remove(Name, "Name="),
+                                                                                                                                                                                                                                                                                                                                     .default = "")) |> dplyr::select(seqid, source, type, start, end, strand, ID, Name, description, biotype) |> GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns = TRUE)
+
+top_genes <- top_Pm_genes |> dplyr::rename(START = BIN_START, END = BIN_END) |> GenomicRanges::makeGRangesFromDataFrame(na.rm = TRUE, keep.extra.columns = TRUE)
+
+top_exons <- top_Pm_exons |> dplyr::rename(START = BIN_START, END = BIN_END) |> GenomicRanges::makeGRangesFromDataFrame(na.rm = TRUE, keep.extra.columns = TRUE)
+
+gene_intervals <- plyranges::join_overlap_intersect(top_genes, PmGFF_genes) |> GenomicRanges::as.data.frame()
+
+exon_intervals <- plyranges::join_overlap_intersect(top_exons, PmGFF_genes) |> GenomicRanges::as.data.frame()
+
+#unique_genes <- unique(gene_intervals$ID)
+
+unique_genes_metadata <- gene_intervals |> dplyr::group_by(ID) |> dplyr::slice_max(abs(TajimaD)) |> dplyr::distinct(ID, .keep_all = TRUE)
+
+unique_exons_metadata <- exon_intervals |> dplyr::group_by(ID) |> dplyr::slice_max(abs(TajimaD)) |> dplyr::distinct(ID, .keep_all = TRUE)
+
+unique_genes_metadata <- unique_genes_metadata |> dplyr::mutate(Overlap = dplyr::case_when(ID %in% unique_exons_metadata$ID ~ "Yes",
+                                                                                           .default = "No"))
+unique_exons_metadata <- unique_exons_metadata |> dplyr::mutate(Overlap = dplyr::case_when(ID %in% unique_genes_metadata$ID ~ "Yes",
+                                                                                           .default = "No"))
+
+overlapping_genes <- unique_genes_metadata |> subset(Overlap == "Yes") |> dplyr::select(seqnames, TajimaD, ID, Name, description, biotype) |> dplyr::rename(CHROM = seqnames, gene_Tajima = TajimaD)
+
+overlapping_exons <- unique_exons_metadata |> subset(Overlap == "Yes") |> dplyr::select(seqnames, TajimaD, ID, Name, description, biotype) |> dplyr::rename(CHROM = seqnames, exon_Tajima = TajimaD)
+
+overlaps <- dplyr::left_join(overlapping_genes, overlapping_exons) |> 
+  dplyr::mutate(diff_Tajima = dplyr::case_when(gene_Tajima != exon_Tajima ~ "Yes",
+                                               .default = "No"))
+
+overlaps |> data.table::fwrite("gene_exon_overlapping_sig_Tajima_2kb.txt", sep = "\t")
+
+nonoverlapping_genes <- unique_genes_metadata |> subset(Overlap == "No") |> dplyr::select(seqnames, TajimaD, ID, Name, description, biotype) |> dplyr::rename(CHROM = seqnames, gene_Tajima = TajimaD)
+
+nonoverlapping_genes |> data.table::fwrite("gene_overlapping_sig_Tajima.txt", sep = "\t")
+
+nonoverlapping_exons <- unique_exons_metadata |> subset(Overlap == "No") |> dplyr::select(seqnames, TajimaD, ID, Name, description, biotype) |> dplyr::rename(CHROM = seqnames, exon_Tajima = TajimaD)
+
+nonoverlapping_exons |> data.table::fwrite("exons_overlapping_sig_Tajima.txt", sep = "\t")
+
+nonneutral_genes <- nonneutral_Pm_genes |> dplyr::rename(START = BIN_START, END = BIN_END) |> GenomicRanges::makeGRangesFromDataFrame(na.rm = TRUE, keep.extra.columns = TRUE)
+
+nonneutral_gene_intervals <- plyranges::join_overlap_intersect(nonneutral_genes, PmGFF_genes) |> GenomicRanges::as.data.frame()
+
+nonneutral_genes_metadata <- nonneutral_gene_intervals |> dplyr::group_by(ID) |> dplyr::slice_max(abs(TajimaD)) |> dplyr::distinct(ID, .keep_all = TRUE)
+
+Tajima_genes <- Pm_genes_Tajima |> dplyr::rename(START = BIN_START, END = BIN_END) |> GenomicRanges::makeGRangesFromDataFrame(na.rm = TRUE, keep.extra.columns = TRUE)
+
+Tajima_gene_intervals<- plyranges::join_overlap_intersect(Tajima_genes, PmGFF_genes) |> GenomicRanges::as.data.frame()
+
+Tajima_genes_metadata <- Tajima_gene_intervals |> dplyr::group_by(ID) |> dplyr::slice_max(abs(TajimaD)) |> dplyr::distinct(ID, .keep_all = TRUE)
+
+Tajima_genes_metadata |> writexl::write_xlsx("Pm_genes_Tajima_2kb.xlsx")
+
 Pm_chrlen <- data.table::fread("../Pm_chrlen.txt") |> dplyr::select(V1, V3) |> dplyr::mutate(V1 = stringr::str_remove(V1, "PmUG01_")) |> dplyr::mutate(V1 = stringr::str_remove(V1, "_v1")) |> dplyr::mutate(V1 = paste0("chr", V1)) |> dplyr::rename(CHROM = V1, LENGTH = V3)
 
 Pm_chrlen <- Pm_chrlen |> dplyr::mutate(cumsum = ave(LENGTH, FUN=cumsum), toadd = head(c(0, cumsum), -1)) 
@@ -167,7 +246,7 @@ top_gene_highlight <- gene_intervals |> dplyr::mutate(CHROM = paste0("chr", stri
 
 Tajima_gene_plot <- big_Tajima_gene |> ggplot() + geom_point(aes(x = genome_pos, y = TajimaD, color = CHROM)) + discrete_scale("color", "custom", function(n){getPalette[1:2][1:n%%2+1]}) + geom_point(data = top_gene_highlight, aes(x = genome_pos, y = TajimaD), color = getPalette[6]) + theme_linedraw() + scale_x_continuous(name = "Chromosome", breaks = Pm_chrlen$axis_breaks, labels = c(1:14), minor_breaks = NULL) + ggrepel::geom_label_repel(data = top_gene_highlight, min.segment.length = 0, aes(x = genome_pos, y = TajimaD, label = Name, segment.color = getPalette[6], size = 16), nudge_x = 1000, nudge_y = 0.05, color = getPalette[6], max.overlaps = 20) + theme(panel.grid = element_blank(), legend.position = "none", axis.title.x = element_text(size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 16), axis.text.y = element_text(size = 16), axis.ticks.length = unit(0.5,"cm")) + ylab("Tajima's D")
 
-ggsave("../Tajima_genes.png", Tajima_gene_plot, width = 15, height = 10, units = "in", dpi = 600)
+ggsave("Tajima_genes_2kb.png", Tajima_gene_plot, width = 15, height = 10, units = "in", dpi = 600)
 
 big_Tajima_exon <- Pm_exons_Tajima |> dplyr::mutate(CHROM = paste0("chr", stringr::str_replace(CHROM, "PmUG01_(\\d+)_v1", "\\1"))) |> 
   dplyr::mutate(POS = BIN_END - 150) |> dplyr::left_join(Pm_chrlen) |> dplyr::mutate(genome_pos = POS + toadd)
@@ -177,11 +256,11 @@ top_exon_highlight <- exon_intervals |> dplyr::mutate(CHROM = paste0("chr", stri
 
 Tajima_exon_plot <- big_Tajima_exon |> ggplot() + geom_point(aes(x = genome_pos, y = TajimaD, color = CHROM)) + discrete_scale("color", "custom", function(n){getPalette[1:2][1:n%%2+1]}) + geom_point(data = top_exon_highlight, aes(x = genome_pos, y = TajimaD), color = getPalette[6]) + theme_linedraw() + scale_x_continuous(name = "Chromosome", breaks = Pm_chrlen$axis_breaks, labels = c(1:14), minor_breaks = NULL) + ggrepel::geom_label_repel(data = top_exon_highlight, min.segment.length = 0, aes(x = genome_pos, y = TajimaD, label = Name, segment.color = getPalette[6], size = 16), nudge_x = 1000, nudge_y = 0.05, color = getPalette[6], max.overlaps = 20) + theme(panel.grid = element_blank(), legend.position = "none", axis.title.x = element_text(size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 16), axis.text.y = element_text(size = 16), axis.ticks.length = unit(0.5,"cm")) + ylab("Tajima's D")
 
-ggsave("../Tajima_exons.png", Tajima_exon_plot, width = 15, height = 10, units = "in", dpi = 600)
+ggsave("Tajima_exons_2kb.png", Tajima_exon_plot, width = 15, height = 10, units = "in", dpi = 600)
 
 Tajima_plots <- Tajima_gene_plot + Tajima_exon_plot + plot_annotation(tag_levels = "A") + plot_layout(ncol = 1, nrow = 2)
 
-ggsave("../Tajima_plot.png", Tajima_plots, width = 15, height = 20, units = "in", dpi = 600)
+ggsave("Tajima_plot_2kb.png", Tajima_plots, width = 15, height = 20, units = "in", dpi = 600)
 
 gene_list <- c("MSP1", "AMA1", "CSP", "TRAP", "P25", "P48/45", "MDR1", "MDR2", "CRT", "Kelch13", "PPPK-DHPS", "DHFR-TS", "MRP1", "MRP2", "LSA1")
 
