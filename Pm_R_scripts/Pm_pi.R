@@ -6,6 +6,8 @@ Pm_ortholog_pi$BIN_END <- as.integer(Pm_ortholog_pi$BIN_END)
 
 masked_orthologs <- readxl::read_xlsx("Pf-Pm_masked_orthologs.xlsx")
 
+colnames(masked_orthologs) <- c("Pm_CHROM", "Pm_START", "Pm_END", "Pm_LENGTH", "Pm_STRAND", "Group_ID", "Pm_ortho", "Pf_CHROM", "Pf_START", "Pf_END", "Pf_LENGTH", "Pf_STRAND", "Pf_ortho")
+
 Pm_masked_orthos <- masked_orthologs |> dplyr::select(Group_ID, Pm_CHROM, Pm_START, Pm_END, Pm_LENGTH, Pm_ortho) |> dplyr::rename(CHROM = Pm_CHROM, BIN_START = Pm_START, BIN_END = Pm_END)
 
 Pm_pi_orthos_only <- dplyr::left_join(Pm_masked_orthos,Pm_ortholog_pi)
@@ -54,59 +56,3 @@ pi_log_violin <- pi_df |> ggplot() +
   geom_violin(aes(x = variable, y = log_pi, color = variable), draw_quantiles = c(0.25, 0.5, 0.75)) + geom_jitter(aes(x = variable, y = log_pi, color = variable))
 
 species_t <- t.test(pi_df$value ~ pi_df$variable)
-
-#nuc_div <- data.table::fread("out.sites.pi", header = T)
-
-#library(qqman)
-
-#nuc_div$SNP <- row.names(nuc_div)
-
-#manhattan(nuc_div, chr = "CHROM", bp = "POS", p = "PI", ylim = c(min(nuc_div$PI), max(nuc_div$PI)), logp = FALSE, ylab = expression(pi), ) 
-
-#nuc_div$CHROM <- nuc_div$CHROM |> stringr::str_replace(pattern = "15", replacement = "API")
-
-#library(viridis)
-#palette(turbo(15))
-
-#nuc_div$CHROM <- factor(nuc_div$CHROM, levels = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "API"))
-
-#nuc_div |> 
-#  ggplot() +
-#  geom_violin(aes(x = CHROM, y = PI, color = CHROM, fill = CHROM)) +
-#  #geom_jitter(aes(x = Chromosome, y = coverage, color = Chromosome), alpha = 0.3, size = 0.5, height=0.1) +
-#  theme_linedraw() +
-#  theme(legend.position = "none") + 
-  #ylim(0,10) +
-#  labs(y = expression(pi), x = "Chromosome")
-
-#ggsave("C:/Users/zpopkinh/OneDrive - University of North Carolina at Chapel Hill/Pm and Po Sequencing/Twist Pm/pi_violin.png", device = "png", dpi #= 600, width = 12, height = 10, units = "in")
-
-#nuc_div |> 
-#  ggplot() +
-#  geom_boxplot(aes(x = CHROM, y = PI, color = CHROM)) +
-#  #geom_jitter(aes(x = Chromosome, y = coverage, color = Chromosome), alpha = 0.3, size = 0.5, height=0.1) +
-#  theme_linedraw() +
-#  theme(legend.position = "none") + 
-#  theme(axis.text.y = element_text(size = 30),
-#        axis.title.y = element_text(size = 30),
-#        axis.title.x = element_text(size = 30),
-#        plot.title = element_text(size = 30),
-#        axis.text.x = element_text(size = 30)) +
-  #ylim(0,10) +
-#  labs(y = expression(pi), x = "Chromosome") +
-#  ggtitle(expression(paste("Per-Site Nucleotide Diversity ", "(", pi, ,")", " within Tanzanian ", italic("P. malariae"), " Isolates")))
-
-#ggsave("C:/Users/zpopkinh/OneDrive - University of North Carolina at Chapel Hill/Pm and Po Sequencing/Twist Pm/pi_boxplot.png", device = "png", dpi = 600, width = 15, height = 8, units = "in")
-
-#summary(nuc_div$PI)
-
-#pi_chrom_aov <- aov(nuc_div$PI ~ nuc_div$CHROM)
-
-#summary(pi_chrom_aov)
-
-#TukeyHSD(pi_chrom_aov)
-
-#pi_stats_by_chrom <- nuc_div |> dplyr::group_by(CHROM) |> dplyr::summarise(Average = mean(PI)) #may add more later
-
-#max(pi_stats_by_chrom$Average)
-#min(pi_stats_by_chrom$Average)
