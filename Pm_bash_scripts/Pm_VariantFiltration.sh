@@ -32,8 +32,8 @@ bcftools view -m2 -M2 -v snps Pm_HC_hard_filtered.vcf.gz -O z -o Pm_HC_hard_filt
 
 gatk VariantsToTable -V Pm_HC_hard_filtered_biallelic_snps_only.vcf.gz -F QD -F FS -F MQ -F MQRankSum -F ReadPosRankSum -O filtered_biallelics.table
 
-bcftools view -R ^Pmalariae_trf.bed -Oz -o Pm_TRs_masked.vcf.gz Pm_HC_hard_filtered_biallelic_snps_only.vcf.gz
+bcftools view -T ^Pmalariae_trf_sort.bed -Oz -o Pm_TRs_masked.vcf.gz Pm_HC_hard_filtered_biallelic_snps_only.vcf.gz
 
-bcftools view -R ^Pm_PIRs.bed -Oz -o Pm_PIRs_masked.vcf.gz Pm_TRs_masked.vcf.gz
+bcftools view -T ^Pm_PIRs.bed -Oz -o Pm_PIRs_masked.vcf.gz Pm_TRs_masked.vcf.gz
 
 vcftools --gzvcf Pm_PIRs_masked.vcf.gz --max-missing 0.8 --recode --recode-INFO-all --stdout | gzip -c > Pm_HC_missingness_filtered_first.vcf.gz
