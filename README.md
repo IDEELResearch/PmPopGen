@@ -17,9 +17,9 @@ The following scripts are intended to be run in the order given:
 3. Pm_bwa_individual.sh
 4. Pm_Picard.sh
 5. Pm_HC_generate_gVCF.sh: generates gVCF file for each sample
-6. Pm_HC_genotype_gVCFs.sh: genotypes variants sites across entire sample pool, yielding vcf files showing variant sites
+6. Pm_HC_genotype_gVCFs.sh: genotypes individual gVCF files across entire sample pool, yielding vcf file showing variant sites
 7. Pm_filtering_determination.R
-8. Pm_VariantFiltration.sh
+8. Pm_VariantFiltration.sh: applies quality-filtering thresholds to VCF file, removing variant sites and individual samples that fail
 9. COI_Pm_coiaf.R: estimates complexity of infection for each sample using COIAF
 10. Pf_sample_picker.R
 
