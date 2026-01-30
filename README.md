@@ -13,28 +13,28 @@ Shell scripts rely on functioning installations of trim_galore, BBMap, bwa-mem2,
 The following scripts are intended to be run in the order given:
 
 1. Pm_trim_individual_scripts.sh
-2. Pm_bbsplit.sh
+2. Pm_bbsplit.sh: competitively aligns reads across multiple reference genomes
 3. Pm_bwa_individual.sh
 4. Pm_Picard.sh
-5. Pm_HC_generate_gVCF.sh
-6. Pm_HC_genotype_gVCFs.sh
+5. Pm_HC_generate_gVCF.sh: generates gVCF file for each sample
+6. Pm_HC_genotype_gVCFs.sh: genotypes variants sites across entire sample pool, yielding vcf files showing variant sites
 7. Pm_filtering_determination.R
 8. Pm_VariantFiltration.sh
-9. COI_Pm_coiaf.R
+9. COI_Pm_coiaf.R: estimates complexity of infection for each sample using COIAF
 10. Pf_sample_picker.R
 
 These scripts must be completed before running any others (excluding scripts assessing sequencing metrics such as coverage, depth, and degree of enrichment) because the other scripts exclusively use monoclonal samples.
 
-11. download_Pf7_vcfs.sh
+11. download_Pf7_vcfs.sh: downloads publicly-available P. falciparum VCF files from Pf7 database
 12. Pf_ortholog_samples.sh
-13. generate_Pm_beds.sh
+13. generate_Pm_beds.sh: generates bed files of P. malariae genome containing and excluding specific genomic intervals
 14. ortholog_masker.R
-15. Pm_pi.sh
-16. Pf_pi.sh
+15. Pm_pi.sh: calculates nucleotide diversity of in P. malariae orthologous genes
+16. Pf_pi.sh: calculates nucleotide diversity of in P. malariae orthologous genes
 17. Pm_pi.R
-18. LD_decay.R
+18. LD_decay.R: calculates and graphs the decay of linkage disequilibrium across genomic intervals in both P. malariae and P. falciparum
 19. Pm_hmmibdr.R
-20. Pm_PCA.R
+20. Pm_PCA.R: performs and graphs principal components analysis on monoclonal P. malariae isolates
 21. Pm_DAPC.R
 22. ADMIXTURE.R
 23. Pm_FST.R
