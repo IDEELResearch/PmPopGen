@@ -33,7 +33,7 @@ These scripts must be completed before running any others (excluding scripts ass
 16. Pf_pi.sh: calculates nucleotide diversity of in P. malariae orthologous genes
 17. Pm_pi.R
 18. LD_decay.R: calculates and graphs the decay of linkage disequilibrium across genomic intervals in both P. malariae and P. falciparum
-19. Pm_hmmibdr.R
+19. Pm_hmmibdr.R: uses hidden Markov model to identify genomic segments that are identical by descent
 20. Pm_PCA.R: performs and graphs principal components analysis on monoclonal P. malariae isolates
 21. Pm_DAPC.R: performs and plots discriminant analysis of principal components to identify samples clustered by genetic similarity
 22. ADMIXTURE.R: Uses ADMIXTURE to calculate estimated number of population clusters within sample pool.
