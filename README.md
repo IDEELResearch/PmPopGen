@@ -35,8 +35,8 @@ These scripts must be completed before running any others (excluding scripts ass
 18. LD_decay.R: calculates and graphs the decay of linkage disequilibrium across genomic intervals in both P. malariae and P. falciparum
 19. Pm_hmmibdr.R
 20. Pm_PCA.R: performs and graphs principal components analysis on monoclonal P. malariae isolates
-21. Pm_DAPC.R
-22. ADMIXTURE.R
+21. Pm_DAPC.R: performs and plots discriminant analysis of principal components to identify samples clustered by genetic similarity
+22. ADMIXTURE.R: Uses ADMIXTURE to calculate estimated number of population clusters within sample pool.
 23. Pm_FST.R
 24. MIT_API_processing.sh
 25. Pm_phylogeny.R
