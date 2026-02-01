@@ -1,3 +1,9 @@
+###############################################################
+################# Pf_sample_picker ########################
+###############################################################
+#Description: selects and filters P. falciparum samples from 
+#publicly-available Pf7 database. Also compiles metadata for mapping and analyses
+
 setwd("C:/Users/zpopkinh/OneDrive - University of North Carolina at Chapel Hill/Pm and Po Sequencing/Twist Pm/rerun")
 
 Pf_samples <- readxl::read_xlsx("Pf7_samples_for_zach.xlsx")
@@ -100,3 +106,4 @@ Pf_samples <- relevant_Pf |> dplyr::left_join(Pf_COI) |> subset(mean_COI == 1) |
 Pf_samples |> data.table::fwrite("Pf_ortholog_samples.txt", sep = "\n", col.names = F)
 
 country_count <- relevant_Pf |> dplyr::count(Country)
+
