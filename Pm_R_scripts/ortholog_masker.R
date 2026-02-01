@@ -1,3 +1,9 @@
+###############################################################
+################### ortholog_masker ##########################
+###############################################################
+#Description: generates bed files containing only the 1-to-1 orthologs
+#between Pf and Pm genomes
+
 setwd("C:/Users/zpopkinh/OneDrive - University of North Carolina at Chapel Hill/Pm and Po Sequencing/Twist Pm/rerun/")
 
 all_orthologs <- readxl::read_xlsx("../Pfal-Pmal_1-1_orthologs.xlsx", sheet = "Final set")
@@ -33,3 +39,4 @@ combined_masked <- dplyr::left_join(Pm_masked, Pf_masked, by = "Group.ID") #|> w
 Pm_masked_bed <- combined_masked |> dplyr::select(seqnames.x, start.x, end.x) |> dplyr::rename(CHROM = seqnames.x, START = start.x, STOP = end.x) |> GenomicRanges::makeGRangesFromDataFrame() |> rtracklayer::export.bed("Pm_masked_orthologs.bed")
 
 Pf_masked_bed <- combined_masked |> dplyr::select(seqnames.y, start.y, end.y) |> dplyr::rename(CHROM = seqnames.y, START = start.y, STOP = end.y) |> GenomicRanges::makeGRangesFromDataFrame() |> rtracklayer::export.bed("Pf_masked_orthologs.bed")
+
