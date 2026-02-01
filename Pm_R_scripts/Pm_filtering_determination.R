@@ -1,23 +1,34 @@
+###############################################################
+############# Pm_filtering_determination ######################
+###############################################################
+#Description: titrate quality filtering thresholds for raw
+#variant output from unfiltered vcf file
+
+
 setwd("/Users/zpopkinh/OneDrive - University of North Carolina at Chapel Hill/Pm and Po Sequencing/Twist Pm/")
+
+#load table of all variants in raw vcf file
 vcftable <- data.table::fread("Pm_HC_raw.table", header = TRUE)
 
+#plot quality by depth histogram
 dd <- density(vcftable$QD, na.rm = TRUE)
 plot(dd, t = "l")
 polygon(dd, col = rgb(1, 0, 0, 0.5))
 
+#subset variants to those with QD greater than 5
 QD5 <- vcftable |> subset(QD < 5)
 
 dd5 <- density(QD5$QD)
 polygon(dd5, col = rgb(1, 0, 0, 0.5))
 
+#subset variants to those with QD greater than 5
 QD2.5 <- vcftable |> subset(QD < 2.5)
 
 QD_filtered_prop <- nrow(QD2.5)/nrow(vcftable) #0.063 so filtering out 6.3% of variants (30,370)
 
-#going to implement filters to cut down calculation time and get accurate filtering counts
-
 vcftable <- dplyr::anti_join(vcftable, QD2.5)
 
+#plot histogram of Fisher strand bias
 fs <- density(vcftable$FS)
 
 plot(fs)
@@ -35,6 +46,7 @@ FS_filtered_prop <- nrow(fs10)/nrow(vcftable) #0.067 so filtering out 6.7% of re
 
 vcftable <- dplyr::anti_join(vcftable, fs10)
 
+#plot histogram of mapping quality
 mq <- density(vcftable$MQ)
 
 plot(mq)
@@ -63,6 +75,7 @@ MQ_filtered_prop <- nrow(mq50)/nrow(vcftable) #0.145 so filtering out 14.5% of r
 
 vcftable <- dplyr::anti_join(vcftable,mq50)
 
+#plot histogram of mapping quality rank sum score
 mqrs <- density(vcftable$MQRankSum, na.rm = TRUE)
 plot(mqrs)
 
@@ -77,6 +90,7 @@ MQRS_filtered_prop <- nrow(mqrs2.5)/nrow(vcftable) #0.012 so filtering out 1.2% 
 
 vcftable <- dplyr::anti_join(vcftable,mqrs2.5)
 
+#plot histogram of read position rank sum score
 rprs <- density(vcftable$ReadPosRankSum, na.rm = TRUE)
 
 plot(rprs)
@@ -100,5 +114,7 @@ plot(rprs2.5d)
 
 RPRS_filtered_prop <- nrow(rprs2.5)/nrow(vcftable) #0.005 so filtering out 0.5% of remaining variants(1,887)
 
+#read final tables after applying hard-filtering thresholds
 filteredtable <- read.table("hardfiltered.table", header = TRUE)
+
 biallelictable <- read.table("filtered_biallelics.table", header = TRUE)
