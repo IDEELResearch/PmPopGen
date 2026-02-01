@@ -1,3 +1,9 @@
+###############################################################
+############### Pm_HC_generate_gVCF ###########################
+###############################################################
+#Description: uses GATK haplotypecaller to generate gVCF files of
+#variants across Pm genome for each sample
+
 #!/bin/bash
 ##############################################################
 
