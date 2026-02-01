@@ -1,3 +1,9 @@
+###############################################################
+################### Pm_pi ##########################
+###############################################################
+#Description: plots nucloetide diversity values across Pm and Pf
+#orthologus genes
+
 setwd("C:/Users/zpopkinh/OneDrive - University of North Carolina at Chapel Hill/Pm and Po Sequencing/Twist Pm/rerun")
 
 Pm_ortholog_pi <- data.table::fread("all_Pm_pi.txt")
@@ -56,3 +62,4 @@ pi_log_violin <- pi_df |> ggplot() +
   geom_violin(aes(x = variable, y = log_pi, color = variable), draw_quantiles = c(0.25, 0.5, 0.75)) + geom_jitter(aes(x = variable, y = log_pi, color = variable))
 
 species_t <- t.test(pi_df$value ~ pi_df$variable)
+
