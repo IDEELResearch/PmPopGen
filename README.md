@@ -12,16 +12,16 @@ Shell scripts rely on functioning installations of trim_galore, BBMap, bwa-mem2,
 
 The following scripts are intended to be run in the order given:
 
-1. Pm_trim_individual_scripts.sh
+1. Pm_trim_individual_scripts.sh: trims sequencing adapters from fastq files
 2. Pm_bbsplit.sh: competitively aligns reads across multiple reference genomes
-3. Pm_bwa_individual.sh
-4. Pm_Picard.sh
-5. Pm_HC_generate_gVCF.sh: generates gVCF file for each sample
+3. Pm_bwa_individual.sh: select reads best aligned to the Pm reference genome after competitive alignment
+4. Pm_Picard.sh: adds readgroup information to Pm-aligned bam files
+5. Pm_HC_generate_gVCF.sh: generate gVCF files of variants across Pm genome for each sample
 6. Pm_HC_genotype_gVCFs.sh: genotypes individual gVCF files across entire sample pool, yielding vcf file showing variant sites
-7. Pm_filtering_determination.R
-8. Pm_VariantFiltration.sh: applies quality-filtering thresholds to VCF file, removing variant sites and individual samples that fail
+7. Pm_filtering_determination.R: titrate quality filtering thresholds for raw variant output from unfiltered vcf file
+8. Pm_VariantFiltration.sh: applies hard quality filtering and missingness thresholds to VCF file, limits to SNPs, and excludes hypervariable regions
 9. COI_Pm_coiaf.R: estimates complexity of infection for each sample using COIAF
-10. Pf_sample_picker.R
+10. Pf_sample_picker.R: selects, filters, and compiles metadata for P. falciparum samples from Pf7 database
 
 These scripts must be completed before running any others (excluding scripts assessing sequencing metrics such as coverage, depth, and degree of enrichment) because the other scripts exclusively use monoclonal samples.
 
