@@ -1,13 +1,22 @@
+###############################################################
+###################### Pm_PCA #############################
+###############################################################
+#Description: performs and graphs principal components analysis on monoclonal P. malariae isolates
+
 setwd("C:/Users/zpopkinh/OneDrive - University of North Carolina at Chapel Hill/Pm and Po Sequencing/Twist Pm/rerun/")
 
+#subsets to site by missingess
 system("bcftools view -e 'F_MISSING>=0.02' -Oz -o Pm_PCA.vcf.gz Pm_IBD_pruned.vcf.gz")
 
+#uses plink to calculate PCA across all filtered sites
 system("plink --pca var-wts --vcf Pm_PCA.vcf.gz --const-fid --allow-extra-chr --out plink_IBD_pruned --make-rel")
 
 system("awk '{print $NR}' plink_IBD_pruned.rel > plink_IBD_pruned.rel.diag")
 
+#extracts eigenvalues for Scree plotting
 Pm_eigenvalues <- data.table::fread("plink_IBD_pruned.eigenval")
 
+#extracts eigenvectors for PCA plotting
 Pm_eigenvectors <- data.table::fread("plink_IBD_pruned.eigenvec")
 
 rel_diag <- data.table::fread("plink_IBD_pruned.rel.diag")
@@ -31,6 +40,7 @@ Pm_table <- Pm_table |> dplyr::mutate(Country = dplyr::case_when(stringr::str_de
 library(ggplot2)
 library(viridis)
 
+#plot PCA for PC1 and PC2 of Pm samples
 Pm_table |> ggplot() + theme_bw() +
   geom_point(aes(x = EV1, y = EV2, color = factor(Country)), size = 4) +
   scale_color_viridis(discrete = TRUE, option = "turbo") +
@@ -48,6 +58,7 @@ Pm_table |> ggplot() + theme_bw() +
 
 ggsave("Pm PCA.png", width = 15, height = 12, units = "in", dpi = 600)
 
+#generate scree plot
 scree_df <- Pm_eigenvalues |> dplyr::rename(Eigenvalue = V1) |> tibble::rownames_to_column(var = "PC")
 
 scree_df$PC <- as.numeric(scree_df$PC)
@@ -56,6 +67,7 @@ scree_plot <- scree_df |> ggplot() + geom_line(aes(x = PC, y = prop_var)) + geom
 
 ggsave("scree_plot.png", scree_plot, dpi = 600)
 
+#plot PC3 and PC4
 PC34 <- Pm_table |> ggplot() + theme_bw() +
   geom_point(aes(x = EV3, y = EV4, color = factor(Country)), size = 4) +
   scale_color_viridis(discrete = TRUE, option = "turbo") +
@@ -71,6 +83,7 @@ PC34 <- Pm_table |> ggplot() + theme_bw() +
         legend.text = element_text(size = 20)) +
   ggtitle(expression(paste("Principal Component Analysis of ", italic("P. malariae"), " Isolates")))
 
+#Plot PC5 and PC6
 PC56 <- Pm_table |> ggplot() + theme_bw() +
   geom_point(aes(x = EV3, y = EV4, color = factor(Country)), size = 4) +
   scale_color_viridis(discrete = TRUE, option = "turbo") +
@@ -108,4 +121,5 @@ Pm_wsaf_table |> ggplot() + theme_bw() +
   xlim(-0.2, 0.05) +
   ylim(-0.25, 0.25) +
   ggtitle(expression(paste("Principal Component Analysis of ", italic("P. malariae"), " Isolates")))
+
 
