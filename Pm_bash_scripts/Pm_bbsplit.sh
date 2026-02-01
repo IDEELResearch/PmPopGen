@@ -1,3 +1,9 @@
+###############################################################
+######################### Pm_bbsplit ##########################
+###############################################################
+#Description: uses bbsplit to perform competitive of trimmed reads
+#to P. malariae, P. falciarum, and H. sapiens reference genomes
+
 #!/bin/bash
 ##############################################################
 
@@ -15,10 +21,12 @@ module load samtools
 
 cd /work/users/z/p/zpopkinh/Pm_rerun/
 
+#load all reference genomes to which the trimmed reads will be competitively aligned
 /nas/longleaf/apps/bbmap/38.96/bbmap/bbsplit.sh build=1 ref_Pm=/proj/ideel/resources/genomes/Pmalariae/PmalariaeUG01.fasta ref_Hs=/proj/ideel/resources/genomes/Hsapiens/hg38.fa ref_Pf=/proj/ideel/resources/genomes/Pfalciparum/genomes/Pf3D7.fasta #This only needs to be done once.
 
 cd trim_galore_output/
 
+#perform competitive alignment
 for i in /work/users/z/p/zpopkinh/Pm_rerun/trim_galore_output/*S*_L004_R1*.fq.gz; 
 do #mkdir ${i%_L004*.fq.gz}
 cd ${i%_L004*.fq.gz}
