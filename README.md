@@ -38,7 +38,7 @@ These scripts must be completed before running any others (excluding scripts ass
 21. Pm_DAPC.R: performs and plots discriminant analysis of principal components to identify samples clustered by genetic similarity
 22. ADMIXTURE.R: Uses ADMIXTURE to calculate estimated number of population clusters within sample pool.
 23. Pm_FST.R: Calculates weir-Fst between countries of origin
-24. MIT_API_processing.sh: selects and subsets mitochondrial and apicoplast genomes
+24. MIT_API_processing.sh: extracts mitochondrial and apicoplast sequences for phylogenetic analyses
 25. Pm_phylogeny.R: generates maximum likelihood phylogenetic trees of Pm samples using RaxML
 26. Pm_selection.R: extracts and calcultes Tajima's D and NSL among different genomic regions and intervals
 27. selection.sh: generates bed file showing genomic windows containing specific Pm genes of interest
