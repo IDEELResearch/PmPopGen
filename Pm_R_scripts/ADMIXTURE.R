@@ -1,3 +1,9 @@
+###############################################################
+####################### ADMIXTURE #############################
+###############################################################
+#Description: Uses ADMIXTURE to calculate estimated number of 
+#population clusters within sample pool
+
 setwd("C:/Users/zpopkinh/OneDrive - University of North Carolina at Chapel Hill/Pm and Po Sequencing/Twist Pm/rerun/")
 
 #have to rename chromosomes first
@@ -6,10 +12,13 @@ system("bcftools annotate --rename-chrs Pm_chr_rename.txt -Oz -o ADMIXTURE_input
 
 system("plink --vcf ADMIXTURE_input.vcf.gz --const-fid --allow-extra-chr --out ADMIXTURE")
 
+#use admixture to evaluate cross-validation error among models using 1-10 population clusters
 system("for K in 1 2 3 4 5 6 7 8 9 10; do admixture32 --cv --haploid="*" ADMIXTURE_input.bed $K | tee log${K}.out; done")
 
+#extract cross-validation error values from each model
 system("grep -h CV log*.out > admixture_CV.txt")
 
+#extract and plot CV error to determine best model fit
 CV_values <- data.table::fread("admixture_CV.txt")
 
 CV_values <- CV_values |> dplyr::select(V3, V4) |> dplyr::rename(K = V3, CV = V4)
@@ -23,6 +32,7 @@ CV_plot <- CV_values |> ggplot(aes(x = K, y = CV)) + geom_line() + geom_point() 
 
 ggsave("ADMIXTURE_CV.png", CV_plot, dpi = 600)
 
+#for best model, plot sample assignment and cluster makeup
 admixture_data <- data.table::fread("ADMIXTURE_input.2.Q")
 
 admixture_samples <- data.table::fread("ADMIXTURE_input.fam")
@@ -185,3 +195,4 @@ admixture_pops <- rbind(admixture_pop1, admixture_pop2)
 dadi_admixture <- admixture_pops |> dplyr::select(Sample, Population)
 
 dadi_admixture |> data.table::fwrite("dadi_admixture.txt", sep = "\t")
+
