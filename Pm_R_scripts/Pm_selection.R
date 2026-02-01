@@ -1,3 +1,9 @@
+###############################################################
+##################### Pm_selection ############################
+###############################################################
+#Description: extracts and calcultes Tajima's D and NSL among
+#different genomic regions and intervals
+
 setwd("C:/Users/zpopkinh/OneDrive - University of North Carolina at Chapel Hill/Pm and Po Sequencing/Twist Pm/rerun/")
 
 Pm_genes_Tajima <- data.table::fread("Pm_genes_Tajima.txt") 
@@ -347,3 +353,4 @@ Pf_target_info <- cbind(Pf_target_IDs, Pf_target_names) |> as.data.frame() |> dp
 Pf_targeted_CDS <- PfGFF_CDS |> subset(gene_id %in% Pf_target_IDs)|> GenomicRanges::as.data.frame() |> dplyr::left_join(Pf_target_info) |> GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns = TRUE)
 
 Pf_targeted_CDS |> rtracklayer::export.bed("Pf_target_CDS.bed")
+
