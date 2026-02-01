@@ -1,3 +1,11 @@
+###############################################################
+###################### CDS_selection ############################
+###############################################################
+#Description: extracts sequences of complementarity-determining
+#regions of specific genes of interest (ama1, crt, csp, dhfr-ts, Kelch13, 
+#lsa1, mdr1, mdr2, mrp1, mrp2, msp1, p25, p48-45, pppk-dhps, trap)
+#for selection analysis
+
 #!/bin/bash
 ##############################################################
 
