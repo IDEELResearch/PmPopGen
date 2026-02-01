@@ -1,3 +1,9 @@
+###############################################################
+##################### Pm_phylogeny ############################
+###############################################################
+#Description: generates maximum likelihood phylogenetic trees of
+#Pm samples using RaxML
+
 setwd("C:/Users/zpopkinh/OneDrive - University of North Carolina at Chapel Hill/Pm and Po Sequencing/Twist Pm/rerun/")
 
 Pm_clusters <- fastreeR::vcf2clusters("Pm_IBD_pruned.vcf.gz")
@@ -113,3 +119,4 @@ library(patchwork)
 organelle_trees <- API_tree + MIT_tree + plot_annotation(tag_levels = "A")
 
 ggsave("organelle_trees.png", organelle_trees, dpi = 600, width = 19200, height = 12000, units = "px")
+
