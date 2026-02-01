@@ -1,7 +1,13 @@
+###############################################################
+######################### Pm_FST ##############################
+###############################################################
+#Description: Calculates weir-Fst between countries of origin
+
 setwd("C:/Users/zpopkinh/OneDrive - University of North Carolina at Chapel Hill/Pm and Po Sequencing/Twist Pm/rerun")
 
 Pm_wsaf_filtered <- vcfR::read.vcfR("Pm_monoclonals_wsaf_filtered.vcf.gz") |> vcfR::vcfR2tidy()
 
+#generate sample list by country
 sample_list <- Pm_wsaf_filtered$gt$Indiv |> unique()
 
 sample_list <- sample_list |> as.data.frame()
@@ -34,6 +40,7 @@ Nigeria_list$Sample |> as.list() |> data.table::fwrite("Nigeria_samples.txt", se
 
 Tanzania_list$Sample |> as.list() |> data.table::fwrite("Tanzania_samples.txt", sep = "\n", col.names = F)
 
+#calculate Weir Fst between each combination of countries
 system("vcftools --gzvcf Pm_monoclonals_wsaf_filtered.vcf.gz --weir-fst-pop Cameroon_samples.txt --weir-fst-pop DRC_samples.txt --out Cam_DRC")
 
 system("vcftools --gzvcf Pm_monoclonals_wsaf_filtered.vcf.gz --weir-fst-pop Cameroon_samples.txt --weir-fst-pop Nigeria_samples.txt --out Cam_Nigeria")       
@@ -43,5 +50,6 @@ system("vcftools --gzvcf Pm_monoclonals_wsaf_filtered.vcf.gz --weir-fst-pop Came
 system("vcftools --gzvcf Pm_monoclonals_wsaf_filtered.vcf.gz --weir-fst-pop DRC_samples.txt --weir-fst-pop Nigeria_samples.txt --out DRC_Nigeria")       
 
 system("vcftools --gzvcf Pm_monoclonals_wsaf_filtered.vcf.gz --weir-fst-pop DRC_samples.txt --weir-fst-pop Tanzania_samples.txt --out DRC_Tanzania")       
+
 
 system("vcftools --gzvcf Pm_monoclonals_wsaf_filtered.vcf.gz --weir-fst-pop Nigeria_samples.txt --weir-fst-pop Tanzania_samples.txt --out Nigeria_Tanzania")
