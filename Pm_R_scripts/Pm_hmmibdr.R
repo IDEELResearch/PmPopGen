@@ -1,10 +1,22 @@
+###############################################################
+###################### Pm_hmmibdr #############################
+###############################################################
+#Description: uses hidden Markov model to identify genomic segments 
+#that are identical by descent
+
 setwd("C:/Users/zpopkinh/OneDrive - University of North Carolina at Chapel Hill/Pm and Po Sequencing/Twist Pm/rerun/")
 
 #system("bcftools view -q 0.25 -Oz -o Pm_majors.vcf.gz Pm_monoclonals_wsaf_filtered.vcf.gz")
 #system("bcftools view -e 'PLMAF<0.05' -Oz -o Pm_majors_PLMAF_filtered.vcf.gz Pm_majors.vcf.gz")
+
+#subset to monoclonal samples
 system("bcftools view -Oz -o Pm_monoclonals_wsaf_filtered.vcf.gz | vcfdo wsaf | -i 'FORMAT/WSAF =0 | FORMAT/WSAF =1' Pm_monoclonals_wsaf.vcf.gz")
 system("bcftools view -q 0.25 -e 'PLMAF<0.05' -Oz -o Pm_IBD.vcf.gz Pm_monoclonals_wsaf_filtered.vcf.gz")
+
+#prune intervals
 system("bcftools +prune -m 0.25 -w 1000 -Oz -o Pm_IBD_pruned.vcf.gz Pm_IBD.vcf.gz")
+
+#calculate IBD
 system("python vcf2hmm.py Pm_IBD_pruned.vcf.gz Pm_IBD")
 
 hmmibdr::hmm_ibd(input_file = "Pm_IBD_seq.txt", allele_freqs = "Pm_IBD_freq.txt", output_file = "Pm_hmmIBD")
@@ -13,6 +25,7 @@ hmmibdr::hmm_ibd(input_file = "Pm_IBD_seq.txt", allele_freqs = "Pm_IBD_freq.txt"
 
 Pm_IBD <- data.table::fread("Pm_hmmIBD.hmm_fract.txt")
 
+#plot IBD
 library(ggplot2)
 library(tidyverse)
 
@@ -274,3 +287,4 @@ ggsave("Pf_IBD_plot.png", Pf_IBD_plot, dpi = 600, width = 24, height = 12, units
 combined_IBD_plot <- Pm_IBD_plot / Pf_IBD_plot
  
 ggsave("combined_IBD_plot.png", combined_IBD_plot, dpi = 600, width = 24, height = 24, units = "in")
+
