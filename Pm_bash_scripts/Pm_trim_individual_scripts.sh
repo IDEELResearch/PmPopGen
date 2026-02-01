@@ -1,3 +1,9 @@
+###############################################################
+############### Pm_trim_individual_scripts ####################
+###############################################################
+#Description: uses trim_galore to trim sequencing adapters from 
+#forward and backward gzipped raw sequencing fastq files
+
 #!/bin/bash
 ##############################################################
 
@@ -19,6 +25,7 @@ mkdir trim_galore_output
 
 mkdir bbsplit_output
 
+#for all sets of forward and reverse fastq files in the desired directory, trim illumina sequencing adapters
 for i in /proj/ideel/julianog/HTSF/230914_UNC41-A00434_0694_AHJKN7DSX7/*S*_L004_R*.fastq.gz;
 do sbatch -p general -N 1 -n 4 --mem=100g -t 4:00:00 --wrap="trim_galore ${i%[12]_001.fastq.gz}1_001.fastq.gz ${i%[12]_001.fastq.gz}2_001.fastq.gz --illumina --paired --fastqc -o /work/users/z/p/zpopkinh/Pm_full_HC/NovaSeq/trim_galore_output/";
 done
