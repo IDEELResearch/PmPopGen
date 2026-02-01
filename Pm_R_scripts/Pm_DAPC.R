@@ -1,12 +1,20 @@
+###############################################################
+###################### Pm_DAPC #############################
+###############################################################
+#Description: performs and plots discriminant analysis of principal 
+#components to identify samples clustered by genetic similarity
+
 setwd("C:/Users/zpopkinh/OneDrive - University of North Carolina at Chapel Hill/Pm and Po Sequencing/Twist Pm/rerun/")
 
 Pm_VCF <- vcfR::read.vcfR("Pm_PCA.vcf.gz") |> vcfR::vcfR2genlight()
 
+#uses adegent methods to find {3} clusters among all samples using the first 50 principal components
 Pm_clust <- adegenet::find.clusters(Pm_VCF, n.pca = 50, n.clust = 3)
 #50 PCs, 3 clusters based on BIC
 
 Pm_DAPC <- adegenet::dapc(Pm_VCF, Pm_clust$grp, n.pca = 50, n.da = 2)
 
+#generates scatterplot of samples delineating clusters
 Pm_scatter <- ggplot(Pm_DAPC$ind.coord, aes(x = LD1, y = LD2, color = Pm_clust$grp)) +
   geom_vline(xintercept = 0, linewidth = 2) + geom_hline(yintercept = 0, linewidth = 2) +
   geom_point(size = 10, shape = 20) +
@@ -38,3 +46,4 @@ ggsave("Pm_clusters_geography.png", Pm_clusters_geog, dpi = 600)
 Pm_DAPC_plot <- Pm_scatter + plot_spacer() + Pm_clusters_geog + plot_annotation(tag_levels = "A") + plot_layout(widths = c(4, 0.5, 4))
 
 ggsave("Pm_DAPC.png", Pm_DAPC_plot, dpi = 600, width = 20, height = 10, units = "in")
+
