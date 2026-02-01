@@ -26,23 +26,23 @@ The following scripts are intended to be run in the order given:
 These scripts must be completed before running any others (excluding scripts assessing sequencing metrics such as coverage, depth, and degree of enrichment) because the other scripts exclusively use monoclonal samples.
 
 11. download_Pf7_vcfs.sh: downloads publicly-available P. falciparum VCF files from Pf7 database
-12. Pf_ortholog_samples.sh
+12. Pf_ortholog_samples.sh: subsets VCF to matched samples for nucleotide diversity calculation and comparison
 13. generate_Pm_beds.sh: generates bed files of P. malariae genome containing and excluding specific genomic intervals
-14. ortholog_masker.R
+14. ortholog_masker.R: generates bed files containing only the 1-to-1 orthologs between Pf and Pm genomes
 15. Pm_pi.sh: calculates nucleotide diversity of in P. malariae orthologous genes
 16. Pf_pi.sh: calculates nucleotide diversity of in P. malariae orthologous genes
-17. Pm_pi.R
+17. Pm_pi.R: plots nucloetide diversity values across Pm and Pf orthologues
 18. LD_decay.R: calculates and graphs the decay of linkage disequilibrium across genomic intervals in both P. malariae and P. falciparum
 19. Pm_hmmibdr.R: uses hidden Markov model to identify genomic segments that are identical by descent
 20. Pm_PCA.R: performs and graphs principal components analysis on monoclonal P. malariae isolates
 21. Pm_DAPC.R: performs and plots discriminant analysis of principal components to identify samples clustered by genetic similarity
 22. ADMIXTURE.R: Uses ADMIXTURE to calculate estimated number of population clusters within sample pool.
-23. Pm_FST.R
-24. MIT_API_processing.sh
-25. Pm_phylogeny.R
-26. Pm_selection.R
-27. selection.sh
-28. selection_Pf.sh
-29. CDS_selection.sh
+23. Pm_FST.R: Calculates weir-Fst between countries of origin
+24. MIT_API_processing.sh: selects and subsets mitochondrial and apicoplast genomes
+25. Pm_phylogeny.R: generates maximum likelihood phylogenetic trees of Pm samples using RaxML
+26. Pm_selection.R: extracts and calcultes Tajima's D and NSL among different genomic regions and intervals
+27. selection.sh: generates bed file showing genomic windows containing specific Pm genes of interest
+28. selection_Pf.sh: generates bed file showing genomic windows containing specific Pf genes of interest
+29. CDS_selection.sh: extracts sequences of complementarity-determining regions of specific genes of interest for selection analysis
 
 Other scripts do not need to be run in any particular order, other than needing to complete alignment and deduplicating before calculating coverage and depth.
