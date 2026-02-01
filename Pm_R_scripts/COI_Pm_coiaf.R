@@ -1,3 +1,10 @@
+###############################################################
+##################### COI_Pm_coiaf ############################
+###############################################################
+#Description: estimates complexity of infection (COI) for each sample
+#using all SNP data per the COI with Allele Frequencies (COIAF) method
+
+
 #devtools::install_github("bailey-lab/coiaf@v0.1.2")
 
 library(vcfR)
@@ -144,3 +151,4 @@ Pm_polyclonals <- Pm_COI |> subset(mean_COI > 1)
 Pf_polyclonals <- Pf_COI |> subset(mean_COI > 1)
 
 Pf_polyclonals |> dplyr::count(mean_COI)
+
