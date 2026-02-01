@@ -1,3 +1,8 @@
+###############################################################
+######################### Pf_pi ###############################
+###############################################################
+#Description: calculates nucleotide diversity of in P. falciparum orthologous genes
+
 #!/bin/bash
 ##############################################################
 
@@ -16,6 +21,5 @@ vcftools --gzvcf Pf_ortholog_samples_orthos_only.vcf.gz --chr $CHROM --from-bp $
 done < Pf_masked_orthologs.bed
 
 #append these into one file for each species then use R to extract only the lines that actually matter by comparing it to the ortholog intervals
-
 cd Pf_pi/
 cat *.windowed.pi >> all_Pf_pi.txt
