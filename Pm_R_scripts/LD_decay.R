@@ -1,7 +1,15 @@
+###############################################################
+######################### LD_decay ###############################
+###############################################################
+#Description: calculates and graphs the decay of linkage disequilibrium 
+#across genomic intervals in both P. malariae and P. falciparum
+
 setwd("C:/Users/zpopkinh/OneDrive - University of North Carolina at Chapel Hill/Pm and Po Sequencing/Twist Pm/rerun")
 
+#use plink to calculate LD across intervals of Pm genome
 system("plink --vcf Pm_HC_missingness_filtered_first.vcf.gz --double-id --allow-extra-chr --set-missing-var-ids @:# --maf 0.01 --geno 0.1 --mind 0.5 --r2 gz --ld-window 100 --ld-window-kb 1000 --ld-window-r2 0 --out Pm_LD")
 
+#use plink to calculate LD across intervals of Pf genome
 system("plink --vcf Pf_ortholog_samples.vcf.gz --double-id --allow-extra-chr --set-missing-var-ids @:# --maf 0.01 --geno 0.1 --mind 0.5 --r2 gz --ld-window 100 --ld-window-kb 1000 --ld-window-r2 0 --out Pf_LD")
 
 Pm_LD <- data.table::fread("Pm_LD.ld.gz")
@@ -14,6 +22,7 @@ Pm_LD <- Pm_LD |> dplyr::mutate(Distance = BP_B - BP_A)
 
 Pm_decay <- Pm_LD |> dplyr::group_by(Distance) |> dplyr::summarise(Mean_R2 = mean(R2), Median_R2 = median(R2))
 
+#Plot LD decay
 library(ggplot2)
 
 Pm_decay |> ggplot() + geom_smooth(aes(x = Distance, y = Mean_R2))
@@ -181,3 +190,4 @@ pi_plot <- readRDS("pi_plot.rds")
 Fig2_0.05 <- pi_plot + LD_with_inset_0.05 + plot_annotation(tag_levels = list(c("A", "B"))) & theme(plot.tag = element_text(size = 24, family = "bold"))
 
 ggsave("Fig2_0.05.png", Fig2_0.05, dpi = 600, height = 10, width = 15, units = "in")
+
