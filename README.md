@@ -40,9 +40,10 @@ These scripts must be completed before running any others (excluding scripts ass
 23. Pm_FST.R: Calculates weir-Fst between countries of origin
 24. MIT_API_processing.sh: extracts mitochondrial and apicoplast sequences for phylogenetic analyses
 25. Pm_phylogeny.R: generates maximum likelihood phylogenetic trees of Pm samples using RaxML
-26. Pm_selection.R: extracts and calcultes Tajima's D and NSL among different genomic regions and intervals
-27. selection.sh: generates bed file showing genomic windows containing specific Pm genes of interest
-28. selection_Pf.sh: generates bed file showing genomic windows containing specific Pf genes of interest
-29. CDS_selection.sh: extracts sequences of complementarity-determining regions of specific genes of interest for selection analysis
+26. Pm_nSL.sh: calculates NSL by chromosome
+27. Pm_selection.R: calculates, extracts, and visualizes Tajima's D and extracts and visualizes NSL among different genomic regions and intervals
+28. selection.sh: generates bed file showing genomic windows containing specific Pm genes of interest
+29. selection_Pf.sh: generates bed file showing genomic windows containing specific Pf genes of interest
+30. CDS_selection.sh: extracts sequences of complementarity-determining regions of specific genes of interest for selection analysis
 
 Other scripts do not need to be run in any particular order, other than needing to complete alignment and deduplicating before calculating coverage and depth.
